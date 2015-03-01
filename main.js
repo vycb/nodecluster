@@ -1,10 +1,12 @@
 var cluster = require('cluster'),
 http = require('http'),
+estatic = require('ecstatic'),
 fs = require('fs'),
 ejs = require('ejs'),
 index = ejs.compile(fs.readFileSync(__dirname + '/pub/index.html',
 	'utf8'), {delimiter: '?', helpers:{echohtml:
 	function(s, i){return s+":"+ (!i? 1:i) +" echohtml!"}}}),
+serve = estatic({root: __dirname+'/public', showDir:true, autoIndex: true}),
 	numr
 	;
 
@@ -36,17 +38,32 @@ if(cluster.isMaster){
 
 }else{
 
-	// Worker processes have a http server.
 	http.Server(function(req, res){
+		switch(req.url){
+			case "/":
+			default:
+				res.writeHead(200, {'content-type': 'text/html'});
+				res.write(index({hello: "Hello nodejs!", numr: numr}));
+
+				break;
+
+			case "/pub":
+			case "/pub/":
+			case "/pub/index.html":
+				serve(req, res, next);
+				break;
+		}
+
+		res.end();
+
+		// notify master about the request
+		process.send({cmd: 'notifyRequest'});
+
 		process.on('message', function(msg){
 			if(msg){
 				numr = msg.numr;
 			}
 		});
-		res.writeHead(200);
-		res.end(index({hello: "Hello nodejs!", numr: numr}));
 
-		// notify master about the request
-		process.send({cmd: 'notifyRequest'});
 	}).listen(8000);
 }
