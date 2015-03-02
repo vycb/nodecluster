@@ -2,7 +2,7 @@ var
 http = require('http'),
 ejs = require('ejs'),
 fs = require('fs'),
-index = ejs.compile(fs.readFileSync(__dirname + '/pub/index.html',
+index = ejs.compile(fs.readFileSync(__dirname + '/public/index.html',
 	'utf8'), {delimiter: '?', helpers:{echohtml:
 		function(s, i){return s+":"+ (!i? 1:i) +" echohtml!"}}}),
 estatic = require('ecstatic');

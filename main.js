@@ -3,12 +3,13 @@ http = require('http'),
 estatic = require('ecstatic'),
 fs = require('fs'),
 ejs = require('ejs'),
-index = ejs.compile(fs.readFileSync(__dirname + '/pub/index.html',
-	'utf8'), {delimiter: '?', helpers:{echohtml:
+
+index = ejs.compile(fs.readFileSync(__dirname + '/public/index.html','utf8'),{delimiter: '?', helpers:{echohtml:
 	function(s, i){return s+":"+ (!i? 1:i) +" echohtml!"}}}),
-serve = estatic({root: __dirname+'/public', showDir:true, autoIndex: true}),
-	numr
-	;
+
+serve = estatic({root: __dirname+'/public', serverHeader: false,
+	showDir:true, autoIndex: false, baseDir:"/public"});
+
 
 if(cluster.isMaster){
 
@@ -20,7 +21,7 @@ if(cluster.isMaster){
 
 	// Start workers and listen for messages containing
 	// notifyRequest
-	var numCPUs = require('os').cpus().length;
+	var numCPUs = 1;//require('os').cpus().length;
 	for(var i = 0; i < numCPUs; i++){
 		cluster.fork();
 	}
@@ -38,23 +39,16 @@ if(cluster.isMaster){
 
 }else{
 
-	http.Server(function(req, res){
-		switch(req.url){
-			case "/":
-			default:
-				res.writeHead(200, {'content-type': 'text/html'});
-				res.write(index({hello: "Hello nodejs!", numr: numr}));
-
-				break;
-
-			case "/pub":
-			case "/pub/":
-			case "/pub/index.html":
-				serve(req, res, next);
-				break;
+	http.Server(function(req, res, next){
+		if(req.url.indexOf("public") >-1){
+			serve(req, res, next);
 		}
+		else{
+			res.writeHead(200, {'content-type': 'text/html'});
+			res.write(index({hello: "Hello nodejs!", numr: 0}));
 
-		res.end();
+			res.end();
+		}
 
 		// notify master about the request
 		process.send({cmd: 'notifyRequest'});
