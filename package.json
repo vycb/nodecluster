@@ -1,14 +1,25 @@
 {
-  "name": "nodejs",
-  "version": "1.0.0",
-  "description": "",
-  "main": "main.js",
-  "scripts": {
-    "test": "tests"
+  "name" : "nodejs",
+  "version" : "1.0.0",
+  "main" : "./main.js",
+  "scripts" : {
+    "test" : "tests"
   },
-  "keywords": [
-    "nodejs"
-  ],
-  "author": "tvera",
-  "license": "GNU"
+  "keywords" : [ "nodejs" ],
+  "author" : {
+    "name" : "tvera",
+    "email" : "tvera@tve.us",
+    "url" : "http://tvera"
+  },
+  "license" : "GNU",
+  "bugs" : {
+    "url" : "null"
+  },
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/YOUR_LOGIN/nodejs.git"
+	},
+	"bugs": {
+		"url": "http://github.com/YOUR_LOGIN/nodejs/issues"
+	}
 }
